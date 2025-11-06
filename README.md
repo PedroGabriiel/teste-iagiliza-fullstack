@@ -1,122 +1,51 @@
-# Teste Técnico — Desenvolvedor(a) Fullstack
+## Estrutura do repositório
 
-Bem-vindo(a)!
-Este teste avalia sua capacidade de desenvolver uma aplicação Fullstack com TypeScript.
+- `docker-compose.yml` - configura um serviço `db` com PostgreSQL (porta 5432).
+- `.env` - variáveis de ambiente (ex.: `DB_PASSWORD`).
+- `backend/` - código do servidor (TypeScript, Fastify, Prisma).
+	- `package.json` - scripts e dependências (ver `dev` para desenvolvimento).
+	- `prisma/` - esquema do Prisma (`schema.prisma`).
+- `frontend/` - atualmente vazio (placeholder).
 
----
+## O que já foi implementado
 
-## Stack requisitada
+- Backend em TypeScript com Fastify.
+- Script de desenvolvimento: `npm run dev` dentro de `backend` (usa `ts-node-dev`).
+- Prisma configurado com um `schema.prisma` contendo os modelos principais:
+	- `User` (id, name, email, password, relaciona com `Message`).
+	- `Message` (id, content, role, relação com `User`, timestamps).
+- `prisma` está instalado como dependência de desenvolvimento e `@prisma/client` como dependência de runtime.
+- `docker-compose.yml` fornece um serviço `db` (Postgres) usando a variável `DB_PASSWORD` do `.env`.
 
-### Backend
-- Fastify
-- Prisma ORM
-- Zod
-- TypeScript
-- Banco: PostgreSQL
+## Variáveis de ambiente
 
-### Frontend
-- React
-- Vite
-- TypeScript
-- TailwindCSS
-- Axios
-- Zod
+Colocar um arquivo `.env` na raiz (já existe um com `DB_PASSWORD`) contendo pelo menos:
 
----
+- `DB_PASSWORD` - senha do usuário do banco usada pelo `docker-compose`.
+- `DATABASE_URL` - string de conexão do Postgres usada pelo Prisma, por exemplo:
 
-## Desafio: Chat simples com IA simulada
+```
+DATABASE_URL=postgresql://app:<SENHA>@localhost:5432/test_ia_chat?schema=public
+```
 
-Você deve criar um pequeno chat entre o usuário e uma IA simulada.
-A IA não precisa ser real, o backend pode retornar respostas simples ou aleatórias.
+Substitua `<SENHA>` pela mesma senha definida em `DB_PASSWORD`.
 
-O usuário precisa:
-1. Cadastrar-se e fazer login
-2. Ter sua sessão armazenada localmente para manter o login
-3. Enviar e visualizar mensagens da conversa
-4. Receber respostas da IA simulada
-4. Editar seus dados (nome, email)
+## Como rodar localmente
 
----
+1. Iniciar o banco de dados com Docker Compose (na raiz do projeto):
 
-## Funcionalidades obrigatórias
+docker-compose up -d
 
-### Backend
-- Rotas:
-  - POST /register — cria novo usuário
-  - POST /login — autentica usuário
-  - GET /me — retorna dados do usuário logado
-  - PATCH /me — atualiza nome/email do usuário
-  - GET /messages — retorna histórico do usuário logado
-  - POST /message — envia nova mensagem e retorna resposta da IA
-- Validação de entrada e saída com Zod
-- ORM com Prisma
-- Persistência em PostgreSQL
-- Autenticação com JWT simples
-- Tipagem completa em TypeScript
+2. No diretório `backend`, instalar dependências e executar em modo dev:
 
-A IA pode responder com algo simples, por exemplo:
+cd backend
+npm install
+npm run dev
 
-- "Interessante! Conte mais.",
-- "Não tenho certeza, mas parece legal!",
-- "Hmm, e se tentássemos outra abordagem?",
-- "Entendi parcialmente. Você pode explicar melhor?"
+3. Gerar o client do Prisma  e aplicar migrations:
 
----
+npx prisma generate
+# Se quiser criar migrações e sincronizar o banco (ajuste conforme necessário):
+npx prisma migrate dev --name init
 
-### Frontend
-- Páginas:
-  - Login / Cadastro
-  - Chat (lista mensagens + campo de envio)
-  - Perfil (edição de nome/email)
-- Estilização com TailwindCSS
-- Requisições via Axios
-- Validação de formulários com Zod
-- Armazenar informações da sessão (Cookies ou LocalStorage)
-- Mostrar mensagens do usuário e da IA
-
----
-
-## O que será avaliado
-
-| Critério | Peso (1-10)|
-|-----------|------|
-| Boas práticas (nomes, pastas, commits) | 4 |
-| Organização do código | 6 |
-| Validação e tratamento de erros | 7 |
-| Uso correto do TypeScript e do Prisma | 8 |
-| Funcionalidade completa (chat, login, perfil) | 9 |
-| Layout funcional com Tailwind | 10 |
-| Explicação do projeto e funcionalidades | 10 |
-
-### Desafios Bônus
-
-| Critério | Peso (1-5)|
-|-----------|------|
-| Escrita do código em inglês | 1 |
-| Implementar tema claro e escuro | 1 |
-| Utilizar componentes ShadcnUI | 2 |
-| Landing page apresentando o "produto" | 3 |
-| Se comunicar via API com alguma LLM | 4 |
-| Permitir que um usuário possua vários chats | 5 |
-
----
-
-## Dicas
-
-- Prefira componentes pequenos e reutilizáveis
-- Tipagem é importante, mas clareza vem primeiro
-
----
-
-## Entrega
-
-- A entrega do projeto deve ser feita em até 7 dias após o recebimento do link desse repositório
-- Faça um fork público desse repositório
-- Adicione seu código à medida em que desenvolve
-- Inclua:
-  - Este README atualizado com instruções reais de execução do seu projeto
-  - Todo o código fonte do seu projeto
-
----
-
-## **Boa sorte, estamos ansiosos para te receber no time IAgiliza!**
+Observação: verifique se `DATABASE_URL` está corretamente definida no `.env` antes de rodar comandos do Prisma.
