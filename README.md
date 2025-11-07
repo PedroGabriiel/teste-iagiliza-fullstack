@@ -1,51 +1,84 @@
 ## Estrutura do repositório
 
-- `docker-compose.yml` - configura um serviço `db` com PostgreSQL (porta 5432).
-- `.env` - variáveis de ambiente (ex.: `DB_PASSWORD`).
-- `backend/` - código do servidor (TypeScript, Fastify, Prisma).
-	- `package.json` - scripts e dependências (ver `dev` para desenvolvimento).
-	- `prisma/` - esquema do Prisma (`schema.prisma`).
-- `frontend/` - atualmente vazio (placeholder).
+- `docker-compose.yml` — configura o serviço `db` com PostgreSQL (container usa porta 5432; mapeado para a porta `5433` no host).
+- `.env` — variáveis de ambiente (ex.: `DB_PASSWORD`, `DATABASE_URL`, `JWT_SECRET`).
+- `backend/` — servidor em TypeScript (Fastify + Prisma).
+  - `package.json` — scripts e dependências.
+  - `prisma/schema.prisma` — modelos do banco (User, Message) e datasource.
+  - `src/` — código-fonte: `server.ts`, `routes/`, `plugins/`, `services/`, `schemas/`, `types/`.
+- `frontend/` — cliente Vite + React + TypeScript + Tailwind (páginas: Login, Register, Chat, Profile).
 
-## O que já foi implementado
+## Como rodar 
 
-- Backend em TypeScript com Fastify.
-- Script de desenvolvimento: `npm run dev` dentro de `backend` (usa `ts-node-dev`).
-- Prisma configurado com um `schema.prisma` contendo os modelos principais:
-	- `User` (id, name, email, password, relaciona com `Message`).
-	- `Message` (id, content, role, relação com `User`, timestamps).
-- `prisma` está instalado como dependência de desenvolvimento e `@prisma/client` como dependência de runtime.
-- `docker-compose.yml` fornece um serviço `db` (Postgres) usando a variável `DB_PASSWORD` do `.env`.
+1) Subir o banco (Docker):
 
-## Variáveis de ambiente
-
-Colocar um arquivo `.env` na raiz (já existe um com `DB_PASSWORD`) contendo pelo menos:
-
-- `DB_PASSWORD` - senha do usuário do banco usada pelo `docker-compose`.
-- `DATABASE_URL` - string de conexão do Postgres usada pelo Prisma, por exemplo:
-
-```
-DATABASE_URL=postgresql://app:<SENHA>@localhost:5432/test_ia_chat?schema=public
+```cmd
+cd teste-iagiliza-fullstack
+docker-compose up -d db
+docker-compose ps
 ```
 
-Substitua `<SENHA>` pela mesma senha definida em `DB_PASSWORD`.
+2) Backend (novo terminal):
 
-## Como rodar localmente
-
-1. Iniciar o banco de dados com Docker Compose (na raiz do projeto):
-
-docker-compose up -d
-
-2. No diretório `backend`, instalar dependências e executar em modo dev:
-
+```cmd
 cd backend
 npm install
-npm run dev
-
-3. Gerar o client do Prisma  e aplicar migrations:
-
 npx prisma generate
-# Se quiser criar migrações e sincronizar o banco (ajuste conforme necessário):
-npx prisma migrate dev --name init
+npm run dev
+```
 
-Observação: verifique se `DATABASE_URL` está corretamente definida no `.env` antes de rodar comandos do Prisma.
+3) Frontend (outro terminal):
+
+```cmd
+cd frontend
+npm install
+npm run dev
+```
+
+Abra http://localhost:5173 no navegador.
+
+## Endpoints 
+
+- POST /register — criar usuário. Body: { name, email, password }
+- POST /login — autenticar. Body: { email, password } → retorna { token, user }
+- GET /me — retorna dados do usuário atual (Bearer token)
+- GET /messages — lista mensagens do usuário (Bearer token)
+- POST /message — cria mensagem do usuário e resposta da IA simulada (Bearer token)
+
+## Como ver o banco 
+
+- Prisma Studio (GUI):
+
+```cmd
+cd backend
+npx prisma generate
+npx prisma studio
+```
+
+- Docker Desktop: abra o container `db` → Open in Terminal → execute:
+
+```sh
+psql -U app -d test_ai_chat
+\dt
+SELECT * FROM "User";
+```
+
+- Cliente externo: conectar em `localhost:5433` com usuário `app` e senha definida em `.env`.
+
+## Troubleshooting
+
+- ERR_CONNECTION_REFUSED: backend não está rodando — execute `npm run dev` em `backend`.
+- CORS no navegador: reinicie o backend (CORS é aplicado no servidor em onRequest).
+- 400 ao registrar: dados inválidos — verifique validação no frontend.
+- Prisma P1000: cheque `backend/.env` `DATABASE_URL` e credenciais; para recriar DB em dev:
+
+```cmd
+docker-compose down -v
+docker-compose up -d db
+```
+
+## Notas de desenvolvimento
+
+- Token JWT salvo em `localStorage` e enviado em `Authorization: Bearer <token>`.
+- Se houve erro `request.jwtVerify is not a function`, o backend foi atualizado para verificar JWT com `jsonwebtoken` e adicionada declaração de tipos em `backend/src/types/fastify.d.ts`.
+- Fluxo do frontend: inicia em Login → Register → Chat (protegido) e Profile (editar nome/email).

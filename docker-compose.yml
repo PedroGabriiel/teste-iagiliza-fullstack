@@ -6,9 +6,9 @@ services:
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: ${DB_PASSWORD}  # ← Variável de ambiente
-      POSTGRES_DB: test_ia_chat
+      POSTGRES_DB: test_ai_chat
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
 volumes:

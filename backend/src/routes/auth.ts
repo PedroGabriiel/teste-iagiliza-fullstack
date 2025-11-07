@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import prisma from "../plugins/prisma";
 import { registerSchema, loginSchema } from "../schemas/auth";
 import { hashPassword, comparePassword } from "../services/auth";
+import jwt from 'jsonwebtoken'
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post("/register", async (request, reply) => {
@@ -26,7 +27,8 @@ export default async function authRoutes(fastify: FastifyInstance) {
     const ok = await comparePassword(body.password, user.password);
     if (!ok) return reply.status(401).send({ message: "Invalid credentials" });
 
-    const token = fastify.jwt.sign({ sub: user.id }, { expiresIn: "7d" });
+    const secret = process.env.JWT_SECRET || 'change-this-in-env'
+    const token = jwt.sign({ sub: user.id }, secret, { expiresIn: '7d' })
 
     return reply.send({ token, user: { id: user.id, name: user.name, email: user.email } });
   });
