@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
+import api from '../lib/api'
+import { registerSchema } from '../schemas/auth'
 
+// Componente de registro usando Axios + Zod
 export default function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -8,36 +11,21 @@ export default function Register() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // client-side validation to avoid server 400
-    const nextErrors: typeof errors = {}
-    if (!name.trim()) nextErrors.name = 'Nome é obrigatório'
-    const emailTrim = email.trim()
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailTrim) nextErrors.email = 'Email é obrigatório'
-    else if (!emailRegex.test(emailTrim)) nextErrors.email = 'Email inválido'
-    if (!password || password.length < 6) nextErrors.password = 'Senha deve ter ao menos 6 caracteres'
 
-    if (Object.keys(nextErrors).length) {
-      setErrors(nextErrors)
+    const parsed = registerSchema.safeParse({ name: name.trim(), email: email.trim(), password })
+    if (!parsed.success) {
+      // mapeia erros simples para exibir (ZodError.issues)
+      const next: typeof errors = {}
+      parsed.error.issues.forEach(er => {
+        const path = String(er.path?.[0] || '')
+        if (path) next[path as keyof typeof errors] = er.message
+      })
+      setErrors(next)
       return
     }
 
     try {
-      const res = await fetch('http://localhost:3333/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: emailTrim, password })
-      })
-      if (!res.ok) {
-        // try to parse error details from server
-        let text = await res.text()
-        try {
-          const j = JSON.parse(text)
-          if (j.message) text = j.message
-          if (j.details) text += ' - ' + JSON.stringify(j.details)
-        } catch {}
-        throw new Error(String(text || 'Registration failed'))
-      }
+      await api.post('/register', parsed.data)
       alert('Registered, please login')
       window.location.href = '/login'
     } catch (err: any) {

@@ -1,24 +1,37 @@
-// Lightweight fetch-based API helper to avoid adding axios dependency.
+// Cliente Axios para o frontend
+// - Centraliza baseURL e injeta Authorization: Bearer <token> automaticamente
+// - Retorna os dados (response.data) ou lança Error com mensagem do servidor
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosHeaders } from 'axios'
+
 const BASE = 'http://localhost:3333'
 
-async function request(path: string, opts: RequestInit = {}) {
+const client: AxiosInstance = axios.create({ baseURL: BASE })
+
+// Interceptor para injetar token automaticamente
+client.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
-  const headers: Record<string, string> = { ...(opts.headers as Record<string, string> || {}) }
-  if (token) headers.authorization = `Bearer ${token}`
-  if (opts.body && !(opts.body instanceof FormData)) {
-    headers['Content-Type'] = headers['Content-Type'] || 'application/json'
+  if (token) {
+    // Usa AxiosHeaders para manter a API de headers do axios e evitar erros de tipagem
+    const headers = new AxiosHeaders(config.headers)
+    headers.set('Authorization', `Bearer ${token}`)
+    config.headers = headers
   }
-  const res = await fetch(BASE + path, { ...opts, headers })
-  const text = await res.text()
+  return config
+})
+
+async function request(method: string, path: string, data?: any, opts?: AxiosRequestConfig) {
   try {
-    const json = text ? JSON.parse(text) : null
-    if (!res.ok) throw new Error(json?.message || res.statusText)
-    return json
-  } catch (err) {
-    // if response isn't JSON, throw generic error or return text
-    if (!res.ok) throw new Error(text || res.statusText)
-    return text
+    const res = await client.request({ method, url: path, data, ...(opts || {}) })
+    return res.data
+  } catch (err: any) {
+    // Axios error: tenta extrair mensagem do body
+    const message = err?.response?.data?.message || err?.message || String(err)
+    throw new Error(message)
   }
 }
 
-export default { request }
+export default {
+  get: (p: string, opts?: AxiosRequestConfig) => request('get', p, undefined, opts),
+  post: (p: string, d?: any, opts?: AxiosRequestConfig) => request('post', p, d, opts),
+  patch: (p: string, d?: any, opts?: AxiosRequestConfig) => request('patch', p, d, opts),
+}

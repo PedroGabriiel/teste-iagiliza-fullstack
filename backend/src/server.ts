@@ -8,30 +8,25 @@ import { handleError } from "./utils/errors";
 
 const fastify = Fastify({ logger: true });
 
-// registra os plugins
-// habilita CORS para permitir chamadas do frontend (Vite) em http://localhost:5173
-// Registra plugins
+
 fastify.register(jwtPlugin);
 
-// registra as rotas
+// Registra rotas da aplicação
 fastify.register(authRoutes, { prefix: "/" });
 fastify.register(userRoutes, { prefix: "/" });
 fastify.register(messagesRoutes, { prefix: "/" });
 
-// defini um manipulador de erros global
+
 fastify.setErrorHandler(handleError as any);
 
-// loga todas as requisições recebidas (ajuda no debug)
+// Hook executado no início de cada requisição: aplica CORS e registra informações
 fastify.addHook("onRequest", async (request, reply) => {
-  // Habilita CORS para requests vindas do frontend de desenvolvimento
   const origin = request.headers.origin || '*'
-  // Permitir origem específica ou todas para desenvolvimento
   reply.header('Access-Control-Allow-Origin', origin === 'null' ? '*' : origin)
   reply.header('Access-Control-Allow-Credentials', 'true')
   reply.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   reply.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
 
-  // Se for preflight (OPTIONS), responda imediatamente
   if (request.method === 'OPTIONS') {
     reply.code(204).send()
     return
@@ -40,12 +35,12 @@ fastify.addHook("onRequest", async (request, reply) => {
   fastify.log.info({ method: request.method, url: request.url }, "incoming request");
 });
 
-// rota raiz simples para sanity check
+// Rota de verificação simples
 fastify.get("/", async (request, reply) => {
   return reply.send({ message: "IA Chat backend running" });
 });
 
-// imprime todas as rotas registradas ao ficar pronto (ajuda a ver o que está disponível)
+// Ao ficar pronto, imprime as rotas registradas
 ;(async () => {
   try {
     await fastify.ready();

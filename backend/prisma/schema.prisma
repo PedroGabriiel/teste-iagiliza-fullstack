@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema: modelos do banco usados pela aplicação
+// - User: representa um usuário do sistema
+// - Message: mensagens trocadas entre usuário e IA simulada
 
 generator client {
   provider = "prisma-client-js"
@@ -17,8 +15,8 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   name      String
-  email     String   @unique
-  password  String
+  email     String   @unique // email único, usado para login
+  password  String   // hash da senha
   messages  Message[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -26,8 +24,8 @@ model User {
 
 model Message {
   id        String   @id @default(uuid())
-  content   String
-  role      String   // 'user' or 'ai'
+  content   String   // texto da mensagem
+  role      String   // 'user' ou 'ai' para distinguir remetente
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   createdAt DateTime @default(now())

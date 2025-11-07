@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Validações para autenticação e edição do perfil
+//  registerSchema: dados necessários para criar conta
+//  loginSchema: dados para autenticar (email + senha)
+//  updateMeSchema: campos que o usuário pode atualizar
 export const registerSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("Email inválido"),

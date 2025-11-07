@@ -1,11 +1,11 @@
 import 'fastify'
 
 declare module 'fastify' {
-  // Extend FastifyRequest with our runtime-added properties
+  // Extensão de tipos para propriedades adicionadas em tempo de execução
   interface FastifyRequest {
-    // populated after verifying the JWT (holds the decoded token payload)
+    // Conteúdo do token JWT decodificado 
     user?: any
-    // optional helper (kept for compatibility with earlier code)
+    // Assinatura para compatibilidade com código que chamava jwtVerify
     jwtVerify?: () => Promise<any>
   }
 }

@@ -5,18 +5,25 @@ import Register from './pages/Register'
 import Chat from './pages/Chat'
 import Profile from './pages/Profile'
 
+// Verifica se há token salvo no localStorage
 function isAuth() {
   return Boolean(localStorage.getItem('token'))
 }
 
+// Componente wrapper para rotas protegidas
+// - Se não autenticado, redireciona para /login
 function Protected({ children }: { children: JSX.Element }) {
   if (!isAuth()) return <Navigate to="/login" replace />
   return children
 }
 
+// Componente principal da App com navegação básica
+// - Exibe links diferentes dependendo se o usuário está logado
+// - Rotas: '/', '/profile' (protegidas), '/login', '/register'
 export default function App() {
   const logged = isAuth()
 
+  // Remove token e força redirecionamento para tela de login
   function handleLogout() {
     localStorage.removeItem('token')
     window.location.href = '/login'

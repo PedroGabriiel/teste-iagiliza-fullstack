@@ -5,7 +5,6 @@ export default async function jwtPlugin(fastify: FastifyInstance) {
   const secret = process.env.JWT_SECRET || 'change-this-in-env'
 
   fastify.decorateRequest('user', null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fastify.decorateRequest('jwtVerify', async function (this: any) {
     const auth = (this.headers?.authorization as string) || ''
   if (!auth) throw (fastify as any).httpErrors.unauthorized('Missing authorization')

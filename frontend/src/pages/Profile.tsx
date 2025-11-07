@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../lib/api'
+import { updateMeSchema } from '../schemas/auth'
 
+// Página de perfil do usuário (usa Axios + Zod)
 export default function Profile() {
   const [user, setUser] = useState<{ id: string; name: string; email: string; createdAt: string } | null>(null)
   const [loading, setLoading] = useState(true)
@@ -10,19 +13,18 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
+  // Busca perfil do backend; se não autenticado, redireciona
   async function load() {
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) return navigate('/login')
-      const res = await fetch('http://localhost:3333/me', { headers: { authorization: `Bearer ${token}` } })
-      if (res.status === 401) return navigate('/login')
-      if (!res.ok) throw new Error('Failed to load profile')
-      const data = await res.json()
+      const data = await api.get('/me')
       setUser(data)
       setName(data.name || '')
       setEmail(data.email || '')
     } catch (err: any) {
+      if (String(err.message).toLowerCase().includes('unauthorized') || String(err.message).includes('401')) {
+        return navigate('/login')
+      }
       console.error(err)
       setError(err.message || 'Error')
     } finally {
@@ -36,36 +38,28 @@ export default function Profile() {
     try { return new Date(d).toLocaleString() } catch { return d }
   }
 
+  // Validação com Zod e envio do PATCH /me
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    const nextErrors: string[] = []
-    if (!name.trim()) nextErrors.push('Name is required')
-    const emailTrim = email.trim()
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailTrim) nextErrors.push('Email is required')
-    else if (!emailRegex.test(emailTrim)) nextErrors.push('Email is invalid')
-    if (nextErrors.length) return setError(nextErrors.join('; '))
+
+    const parsed = updateMeSchema.safeParse({ name: name.trim(), email: email.trim() })
+    if (!parsed.success) {
+      const messages = parsed.error.issues.map(er => er.message).join('; ')
+      return setError(messages)
+    }
 
     try {
       setSaving(true)
-      const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:3333/me', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: name.trim(), email: emailTrim })
-      })
-      if (res.status === 401) return navigate('/login')
-      if (!res.ok) {
-        const txt = await res.text()
-        throw new Error(txt || 'Save failed')
-      }
-      const updated = await res.json()
+      const updated = await api.patch('/me', parsed.data)
       setUser(updated)
       setName(updated.name)
       setEmail(updated.email)
       alert('Profile updated')
     } catch (err: any) {
+      if (String(err.message).toLowerCase().includes('unauthorized') || String(err.message).includes('401')) {
+        return navigate('/login')
+      }
       setError(err.message || 'Save failed')
     } finally {
       setSaving(false)

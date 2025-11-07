@@ -3,7 +3,13 @@ import prisma from "../plugins/prisma";
 import { updateMeSchema } from "../schemas/auth";
 import jwt from 'jsonwebtoken'
 
+// Rotas para o perfil do usuário autenticado
+//  GET /me: retorna dados públicos do usuário (sem senha)
+//  PATCH /me: atualiza campos permitidos (nome, email)
+
+
 export default async function userRoutes(fastify: FastifyInstance) {
+  // Valida o header Authorization: Bearer token e popula request.user
   const verifyAuth = async (request: any, reply: any) => {
     const auth = (request.headers?.authorization as string) || ''
     if (!auth) throw (fastify as any).httpErrors.unauthorized('Missing authorization')
@@ -19,6 +25,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     }
   }
 
+  // Retorna informações públicas do usuário (sem senha)
   fastify.get("/me", { preHandler: verifyAuth }, async (request, reply) => {
     const userId = (request.user as any).sub;
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true, createdAt: true } });
@@ -26,6 +33,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     return reply.send(user);
   });
 
+  // Atualiza campos permitidos do perfil. Verifica conflito de email antes de atualizar.
   fastify.patch("/me", { preHandler: verifyAuth }, async (request, reply) => {
     const userId = (request.user as any).sub;
     const body = updateMeSchema.parse(request.body);

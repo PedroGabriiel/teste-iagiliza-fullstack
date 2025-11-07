@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import api from '../lib/api'
+import { loginSchema } from '../schemas/auth'
 
+// Componente de Login usando Axios + Zod
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    // valida com Zod antes de enviar
+    const parsed = loginSchema.safeParse({ email, password })
+    if (!parsed.success) {
+      // ZodError possui a propriedade issues com detalhes dos erros
+      const first = parsed.error.issues?.[0]
+      alert(first?.message || 'Entrada inválida')
+      return
+    }
+
     try {
-      const res = await fetch('http://localhost:3333/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
-      const data = await res.json()
+      const data = await api.post('/login', parsed.data)
       const { token } = data
       localStorage.setItem('token', token)
       alert('Logged in')
@@ -24,7 +31,6 @@ export default function Login() {
   }
 
   useEffect(() => {
-    // if already logged, go to chat
     if (localStorage.getItem('token')) {
       window.location.href = '/'
     }

@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import api from '../lib/api'
 
+// Componente de Chat
+// - Carrega mensagens do backend (GET /messages)
+// - Envia mensagem do usuário (POST /message) e recarrega a lista
 type Message = {
   id: string
   content: string
@@ -11,18 +15,10 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
 
+  // Carrega mensagens do servidor e atualiza estado
   async function load() {
     try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('http://localhost:3333/messages', { headers: { authorization: `Bearer ${token}` } })
-      if (!res.ok) {
-        // try to read error message
-        let errText = await res.text()
-        try { errText = JSON.parse(errText).message || errText } catch { }
-        throw new Error(String(errText || 'Failed to load messages'))
-      }
-      const data = await res.json()
-      // Ensure we set an array
+      const data = await api.get('/messages')
       setMessages(Array.isArray(data) ? data : [])
     } catch (err: any) {
       console.error('load messages error', err)
@@ -32,16 +28,12 @@ export default function Chat() {
 
   useEffect(() => { load() }, [])
 
+  // Envia a mensagem do usuário; a resposta da IA é criada no backend
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
     if (!text) return
     try {
-      const res = await fetch('http://localhost:3333/message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', authorization: `Bearer ${localStorage.getItem('token')}` },
-        body: JSON.stringify({ content: text })
-      })
-      if (!res.ok) throw new Error('Send failed')
+      await api.post('/message', { content: text })
       setText('')
       load()
     } catch (err: any) {

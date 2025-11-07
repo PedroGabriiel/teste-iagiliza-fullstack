@@ -4,7 +4,13 @@ import { createMessageSchema } from "../schemas/message";
 import { generateAiResponse } from "../services/ai";
 import jwt from 'jsonwebtoken'
 
+// Rotas relacionadas a mensagens do usuário
+//  GET /messages: retorna todas as mensagens do usuário autenticado
+//  POST /message: cria a mensagem do usuário e gera uma resposta da IA simulada
+
+
 export default async function messagesRoutes(fastify: FastifyInstance) {
+  // Função simples para verificar o token Bearer e popular request.user
   const verifyAuth = async (request: any, reply: any) => {
     const auth = (request.headers?.authorization as string) || ''
     if (!auth) throw (fastify as any).httpErrors.unauthorized('Missing authorization')
@@ -20,12 +26,14 @@ export default async function messagesRoutes(fastify: FastifyInstance) {
     }
   }
 
+  // Lista mensagens do usuário (ordenadas por data)
   fastify.get("/messages", { preHandler: verifyAuth }, async (request, reply) => {
     const userId = (request.user as any).sub;
     const messages = await prisma.message.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
     return reply.send(messages);
   });
 
+  // Cria uma mensagem do usuário e grava também a resposta gerada pela IA simulada
   fastify.post("/message", { preHandler: verifyAuth }, async (request, reply) => {
     const userId = (request.user as any).sub;
     const body = createMessageSchema.parse(request.body);

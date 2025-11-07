@@ -6,7 +6,7 @@ const replies = [
 ];
 
 export function generateAiResponse(_input: string) {
-  // For now return a random reply; can be improved later
+  // Retorna uma resposta aleatória simples
   const idx = Math.floor(Math.random() * replies.length);
   return replies[idx];
 }
