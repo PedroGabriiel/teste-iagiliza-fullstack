@@ -34,6 +34,7 @@ export default function Profile() {
 
   useEffect(() => { load() }, [])
 
+
   function fmtDate(d: string) {
     try { return new Date(d).toLocaleString() } catch { return d }
   }
@@ -66,33 +67,28 @@ export default function Profile() {
     }
   }
 
-  if (loading) return <div className="max-w-md mx-auto bg-white p-6 rounded shadow">Loading...</div>
+  if (loading) return <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow text-gray-900 dark:text-gray-100">Loading...</div>
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-xl mb-4">Profile</h2>
-      {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
+      <h2 className="text-xl mb-4 text-gray-900 dark:text-gray-100">Profile</h2>
+      {error && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>}
 
       {user ? (
         <form onSubmit={handleSave} className="flex flex-col gap-3">
           <div>
-            <label className="text-sm">Name</label>
-            <input className="border p-2 w-full" value={name} onChange={e => setName(e.target.value)} />
+            <label className="text-sm text-gray-700 dark:text-gray-300">Name</label>
+            <input className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" value={name} onChange={e => setName(e.target.value)} />
           </div>
 
           <div>
-            <label className="text-sm">Email</label>
-            <input className="border p-2 w-full" value={email} onChange={e => setEmail(e.target.value)} />
-          </div>
-
-          <div>
-            <label className="text-sm">Member since</label>
-            <div className="p-2 bg-gray-50 rounded">{fmtDate(user.createdAt)}</div>
+            <label className="text-sm text-gray-700 dark:text-gray-300">Email</label>
+            <input className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
 
           <div className="flex gap-2">
-            <button disabled={saving} className="bg-green-600 text-white p-2 rounded">{saving ? 'Saving...' : 'Save'}</button>
-            <button type="button" onClick={() => { setName(user.name); setEmail(user.email); setError(null) }} className="p-2 border rounded">Reset</button>
+            <button disabled={saving} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded">{saving ? 'Saving...' : 'Save'}</button>
+            <button type="button" onClick={() => { setName(user.name); setEmail(user.email); setError(null) }} className="p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100">Reset</button>
           </div>
         </form>
       ) : (

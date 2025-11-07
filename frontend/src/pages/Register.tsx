@@ -34,25 +34,25 @@ export default function Register() {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-xl mb-4">Register</h2>
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
+      <h2 className="text-xl mb-4 text-gray-900 dark:text-gray-100">Register</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <div>
-          <input className="border p-2 w-full" placeholder="Name" value={name} onChange={e => { setName(e.target.value); setErrors(prev => ({ ...prev, name: undefined })); }} />
+          <input className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" placeholder="Name" value={name} onChange={e => { setName(e.target.value); setErrors(prev => ({ ...prev, name: undefined })); }} />
           {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
         </div>
 
         <div>
-          <input className="border p-2 w-full" placeholder="Email" value={email} onChange={e => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: undefined })); }} />
+          <input className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" placeholder="Email" value={email} onChange={e => { setEmail(e.target.value); setErrors(prev => ({ ...prev, email: undefined })); }} />
           {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
         </div>
 
         <div>
-          <input type="password" className="border p-2 w-full" placeholder="Password" value={password} onChange={e => { setPassword(e.target.value); setErrors(prev => ({ ...prev, password: undefined })); }} />
+          <input type="password" className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" placeholder="Password" value={password} onChange={e => { setPassword(e.target.value); setErrors(prev => ({ ...prev, password: undefined })); }} />
           {errors.password && <p className="text-sm text-red-600 mt-1">{errors.password}</p>}
         </div>
 
-        <button className="bg-green-600 text-white p-2 rounded mt-2">Register</button>
+  <button className="bg-green-600 hover:bg-green-700 text-white p-2 rounded mt-2">Register</button>
       </form>
     </div>
   )

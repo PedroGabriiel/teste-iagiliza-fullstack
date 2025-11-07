@@ -37,15 +37,15 @@ export default function Login() {
   }, [])
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-      <h2 className="text-xl mb-4">Login</h2>
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
+      <h2 className="text-xl mb-4 text-gray-900 dark:text-gray-100">Login</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <input className="border p-2" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" className="border p-2" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="bg-blue-600 text-white p-2 rounded mt-2">Login</button>
+  <input className="border p-2 bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+  <input type="password" className="border p-2 bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+  <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded mt-2">Login</button>
       </form>
-      <div className="mt-4 text-sm">
-        <p>Don't have an account? <Link to="/register" className="text-blue-600">Register here</Link></p>
+      <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
+        <p>Don't have an account? <Link to="/register" className="text-blue-600 dark:text-blue-400">Register here</Link></p>
       </div>
     </div>
   )
