@@ -102,6 +102,7 @@ dockercompose up d db
    `frontend/src/pages/Register.tsx`
    `frontend/src/pages/Chat.tsx`
    `frontend/src/pages/Profile.tsx`
+   `frontend/src/pages/Landing.tsx` (página pública de apresentação/CTA)
 
  Tema claro/escuro global:
    Controle global em `frontend/src/App.tsx` com botão no header.
@@ -115,3 +116,8 @@ dockercompose up d db
  Outros arquivos/ajustes relevantes:
    `frontend/tailwind.config.js` — ativado `darkMode: 'class'` e conteúdo relevante adicionado.
    Tratamento de tipos Axios/TS: pequenas correções para evitar erros de tipagem de headers.
+
+Landing page (página pública)
+
+- Arquivo: `frontend/src/pages/Landing.tsx`
+- Comportamento: página pública exibida em `/` quando o usuário não está autenticado. Contém hero, CTAs para Login/Register e uma breve descrição de features.

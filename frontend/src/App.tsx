@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Chat from './pages/Chat'
 import Profile from './pages/Profile'
+import Landing from './pages/Landing'
 
 // Verifica se há token salvo no localStorage
 function isAuth() {
@@ -38,19 +39,19 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <header className="bg-white dark:bg-gray-800 shadow p-4">
         <nav className="container mx-auto flex items-center text-gray-800 dark:text-gray-100">
           <div className="flex gap-4 items-center">
             {logged ? (
               <>
-                <Link to="/" className="text-gray-700 dark:text-gray-100 hover:underline">Chat</Link>
-                <Link to="/profile" className="text-gray-700 dark:text-gray-100 hover:underline">Profile</Link>
+                <Link to="/" className="text-gray-700 dark:text-white hover:text-brand dark:hover:text-brand-50 hover:underline">Chat</Link>
+                <Link to="/profile" className="text-gray-700 dark:text-white hover:text-brand dark:hover:text-brand-50 hover:underline">Profile</Link>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-700 dark:text-gray-100 hover:underline">Login</Link>
-                <Link to="/register" className="text-gray-700 dark:text-gray-100 hover:underline">Register</Link>
+                <Link to="/login" className="text-gray-700 dark:text-white hover:text-brand dark:hover:text-brand-50 hover:underline">Login</Link>
+                <Link to="/register" className="text-gray-700 dark:text-white hover:text-brand dark:hover:text-brand-50 hover:underline">Register</Link>
               </>
             )}
           </div>
@@ -65,7 +66,7 @@ export default function App() {
                 try { document.documentElement.classList.toggle('dark', next === 'dark') } catch {}
                 localStorage.setItem('theme', next)
               }}
-              className="p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              className="btn btn-secondary"
             >
               {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
             </button>
@@ -76,9 +77,13 @@ export default function App() {
       <main className="container mx-auto p-4">
         <Routes>
           <Route path="/" element={
-            <Protected>
-              <Chat />
-            </Protected>
+            logged ? (
+              <Protected>
+                <Chat />
+              </Protected>
+            ) : (
+              <Landing />
+            )
           } />
           <Route path="/profile" element={
             <Protected>
@@ -87,7 +92,7 @@ export default function App() {
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to={logged ? '/' : '/login'} replace />} />
+          <Route path="*" element={<Navigate to={logged ? '/' : '/'} replace />} />
         </Routes>
       </main>
     </div>

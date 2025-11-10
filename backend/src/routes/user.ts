@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import prisma from "../plugins/prisma";
 import { updateMeSchema } from "../schemas/auth";
-import jwt from 'jsonwebtoken'
+import authPreHandler from "../plugins/auth";
 
 // Rotas para o perfil do usuário autenticado
 //  GET /me: retorna dados públicos do usuário (sem senha)
@@ -9,24 +9,11 @@ import jwt from 'jsonwebtoken'
 
 
 export default async function userRoutes(fastify: FastifyInstance) {
-  // Valida o header Authorization: Bearer token e popula request.user
-  const verifyAuth = async (request: any, reply: any) => {
-    const auth = (request.headers?.authorization as string) || ''
-    if (!auth) throw (fastify as any).httpErrors.unauthorized('Missing authorization')
-    const parts = auth.split(' ')
-    if (parts.length !== 2) throw (fastify as any).httpErrors.unauthorized('Bad authorization header')
-    const token = parts[1]
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'change-this-in-env') as any
-      request.user = decoded
-      return decoded
-    } catch (err) {
-      throw (fastify as any).httpErrors.unauthorized('Invalid token')
-    }
-  }
+  // Usa o decorator `request.jwtVerify()` (adicionado pelo plugin jwt)
+  // que valida o token Bearer e popula `request.user` com o payload decodificado.
 
   // Retorna informações públicas do usuário (sem senha)
-  fastify.get("/me", { preHandler: verifyAuth }, async (request, reply) => {
+  fastify.get("/me", { preHandler: authPreHandler }, async (request, reply) => {
     const userId = (request.user as any).sub;
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true, createdAt: true } });
     if (!user) return reply.status(404).send({ message: "User not found" });
@@ -34,7 +21,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
   });
 
   // Atualiza campos permitidos do perfil. Verifica conflito de email antes de atualizar.
-  fastify.patch("/me", { preHandler: verifyAuth }, async (request, reply) => {
+  fastify.patch("/me", { preHandler: authPreHandler }, async (request, reply) => {
     const userId = (request.user as any).sub;
     const body = updateMeSchema.parse(request.body);
 

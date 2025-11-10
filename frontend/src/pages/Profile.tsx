@@ -75,20 +75,20 @@ export default function Profile() {
       {error && <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>}
 
       {user ? (
-        <form onSubmit={handleSave} className="flex flex-col gap-3">
+    <form onSubmit={handleSave} className="flex flex-col gap-3">
           <div>
             <label className="text-sm text-gray-700 dark:text-gray-300">Name</label>
-            <input className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" value={name} onChange={e => setName(e.target.value)} />
+            <input className="input focus:ring-2 focus:ring-brand/30" value={name} onChange={e => setName(e.target.value)} />
           </div>
 
           <div>
             <label className="text-sm text-gray-700 dark:text-gray-300">Email</label>
-            <input className="border p-2 w-full bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" value={email} onChange={e => setEmail(e.target.value)} />
+            <input className="input focus:ring-2 focus:ring-brand/30" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
 
           <div className="flex gap-2">
-            <button disabled={saving} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded">{saving ? 'Saving...' : 'Save'}</button>
-            <button type="button" onClick={() => { setName(user.name); setEmail(user.email); setError(null) }} className="p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100">Reset</button>
+            <button disabled={saving} className="btn btn-primary">{saving ? 'Saving...' : 'Save'}</button>
+            <button type="button" onClick={() => { setName(user.name); setEmail(user.email); setError(null) }} className="btn btn-secondary">Reset</button>
           </div>
         </form>
       ) : (

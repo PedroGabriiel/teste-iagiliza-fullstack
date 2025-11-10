@@ -42,22 +42,22 @@ export default function Chat() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-900 p-6 rounded shadow">
+    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
       <h2 className="text-xl mb-4 text-gray-900 dark:text-gray-100">Chat</h2>
       <div className="space-y-2 mb-4">
         {messages.map(m => (
           <div key={m.id} className={m.role === 'user' ? 'text-right' : 'text-left'}>
             <div className={
               (m.role === 'user'
-                ? 'inline-block p-2 rounded bg-blue-100 text-gray-900 dark:bg-blue-800 dark:text-white'
+                ? 'inline-block p-2 rounded bg-brand-50 text-gray-900 dark:bg-brand dark:text-white'
                 : 'inline-block p-2 rounded bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100')
             }>{m.content}</div>
           </div>
         ))}
       </div>
       <form onSubmit={handleSend} className="flex gap-2">
-        <input value={text} onChange={e => setText(e.target.value)} className="flex-1 border p-2 bg-white dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100" />
-        <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">Send</button>
+        <input value={text} onChange={e => setText(e.target.value)} className="input flex-1" />
+        <button className="btn btn-primary">Send</button>
       </form>
     </div>
   )
