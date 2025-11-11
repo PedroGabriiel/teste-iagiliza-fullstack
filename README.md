@@ -102,7 +102,7 @@ dockercompose up d db
    `frontend/src/pages/Register.tsx`
    `frontend/src/pages/Chat.tsx`
    `frontend/src/pages/Profile.tsx`
-   `frontend/src/pages/Landing.tsx` (página pública de apresentação/CTA)
+   `frontend/src/pages/Landing.tsx` 
 
  Tema claro/escuro global:
    Controle global em `frontend/src/App.tsx` com botão no header.
@@ -112,12 +112,39 @@ dockercompose up d db
  Dependências adicionadas (frontend):
    `axios` — cliente HTTP centralizado.
    `zod` — validação de esquema no frontend.
-
- Outros arquivos/ajustes relevantes:
-   `frontend/tailwind.config.js` — ativado `darkMode: 'class'` e conteúdo relevante adicionado.
-   Tratamento de tipos Axios/TS: pequenas correções para evitar erros de tipagem de headers.
-
+   
 Landing page (página pública)
 
 - Arquivo: `frontend/src/pages/Landing.tsx`
 - Comportamento: página pública exibida em `/` quando o usuário não está autenticado. Contém hero, CTAs para Login/Register e uma breve descrição de features.
+
+## Migração para componentes estilo ShadcnUI (parcial)
+
+Foi iniciado um trabalho incremental para introduzir um conjunto de componentes UI seguindo o estilo e padrões do projeto ShadcnUI:
+
+- Pacotes instalados:
+  - `class-variance-authority` (cva) — para variantes de componentes
+  - `tailwind-merge` — para mesclar classes Tailwind de forma segura
+  - `lucide-react` — conjunto de ícones 
+  - `clsx` — utilitário de composição de classes
+  - `tailwindcss-animate` — plugin de animações Tailwind usado no projeto
+
+- Arquivos novos / atualizados:
+  - `frontend/src/lib/cn.ts` — helper `cn()` (clsx + tailwind-merge) para combinar classes.
+  - `frontend/src/components/ui/Button.tsx` — componente Button usando `cva` e `cn`.
+  - `frontend/src/components/ui/Input.tsx` — componente Input reutilizável.
+  - `frontend/src/components/ui/Card.tsx` — wrapper Card para cartões/containers.
+  - `frontend/tailwind.config.js` — plugin `tailwindcss-animate` adicionado; o `content` já cobre `src/**/*`.
+
+- Páginas atualizadas para usar os novos componentes:
+  - `frontend/src/pages/Login.tsx` — usa `Card`, `Input`, `Button`
+  - `frontend/src/pages/Register.tsx` — usa `Card`, `Input`, `Button`
+  - `frontend/src/pages/Chat.tsx` — usa `Card`, `Input`, `Button`
+  - `frontend/src/pages/Profile.tsx` — usa `Card`, `Input`, `Button`
+  - `frontend/src/pages/Landing.tsx` — passou a usar `Card`/`Button` para CTAs
+
+- Objetivo e estratégia:
+  - Migração incremental: começamos substituindo classes utilitárias (`.btn`, `.input`, `.card`) por componentes React reutilizáveis para reduzir risco e facilitar ajustes visuais.
+  - Manter compatibilidade com o tema claro/escuro.
+
+

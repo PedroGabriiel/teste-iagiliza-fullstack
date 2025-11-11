@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import api from '../lib/api'
+import Button from '../components/ui/Button'
+import Input from '../components/ui/Input'
+import Card from '../components/ui/Card'
 
 // Componente de Chat
 // - Carrega mensagens do backend (GET /messages)
@@ -42,7 +45,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
+    <Card className="max-w-2xl mx-auto">
       <h2 className="text-xl mb-4 text-gray-900 dark:text-gray-100">Chat</h2>
       <div className="space-y-2 mb-4">
         {messages.map(m => (
@@ -56,9 +59,9 @@ export default function Chat() {
         ))}
       </div>
       <form onSubmit={handleSend} className="flex gap-2">
-        <input value={text} onChange={e => setText(e.target.value)} className="input flex-1" />
-        <button className="btn btn-primary">Send</button>
+        <Input value={text} onChange={e => setText(e.target.value)} className="flex-1" />
+        <Button>Send</Button>
       </form>
-    </div>
+    </Card>
   )
 }
