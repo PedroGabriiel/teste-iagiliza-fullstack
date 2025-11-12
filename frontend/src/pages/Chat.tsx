@@ -3,6 +3,7 @@ import api from '../lib/api'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Card from '../components/ui/Card'
+import { useToast } from '../components/ui/Toast'
 
 // Componente de Chat
 // - Carrega mensagens do backend (GET /messages)
@@ -17,6 +18,7 @@ type Message = {
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
+  const { showToast } = useToast()
 
   // Carrega mensagens do servidor e atualiza estado
   async function load() {
@@ -40,7 +42,7 @@ export default function Chat() {
       setText('')
       load()
     } catch (err: any) {
-      alert(err.message || 'Send failed')
+      showToast?.({ title: 'Send failed', description: String(err?.message || 'Error'), type: 'error' })
     }
   }
 

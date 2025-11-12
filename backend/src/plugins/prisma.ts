@@ -1,5 +1,10 @@
+// Import the generated Prisma client directly from the project's generated output.
+// The project previously used a custom generator output. Importing from the
+// generated folder avoids the runtime error "@prisma/client did not initialize yet"
+// when the generated client is not present under node_modules.
 import { PrismaClient } from '../../generated/prisma';
 
+// Usa o cliente gerado instalado via @prisma/client
 const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
 export default prisma;

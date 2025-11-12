@@ -5,6 +5,7 @@ import { updateMeSchema } from '../schemas/auth'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Card from '../components/ui/Card'
+import { useToast } from '../components/ui/Toast'
 
 // Página de perfil do usuário (usa Axios + Zod)
 export default function Profile() {
@@ -15,6 +16,7 @@ export default function Profile() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   // Busca perfil do backend; se não autenticado, redireciona
   async function load() {
@@ -53,18 +55,19 @@ export default function Profile() {
       return setError(messages)
     }
 
-    try {
+      try {
       setSaving(true)
       const updated = await api.patch('/me', parsed.data)
       setUser(updated)
       setName(updated.name)
       setEmail(updated.email)
-      alert('Profile updated')
+      showToast?.({ title: 'Profile updated', type: 'success' })
     } catch (err: any) {
       if (String(err.message).toLowerCase().includes('unauthorized') || String(err.message).includes('401')) {
         return navigate('/login')
       }
       setError(err.message || 'Save failed')
+      showToast?.({ title: 'Save failed', description: String(err?.message || 'Error'), type: 'error' })
     } finally {
       setSaving(false)
     }
